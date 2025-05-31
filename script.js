@@ -1,111 +1,248 @@
-// Soalan utama dan jawapan
-const mainQuestion = {
-    text: "Apakah tarikh lahir saya (DDMMYY)?",
-    answer: "310595", // Contoh jawapan, ubah ikut keperluan
-    clue: "Lihat buku ID #BukuBiru, muka surat 17, baris ke-3"
+// =============================
+// Perpustakaan Confession JS
+// =============================
+
+// -----------------------------
+// DATA
+// -----------------------------
+
+// Puzzle bank (soalan, jawapan, petunjuk buku seterusnya)
+const puzzles = {
+  "puzzle1": {
+    question: "Apakah tarikh lahir saya (DDMMYY)?",
+    answer: "010190",
+    clue: { shelf: "shelf2", color: "blue", position: 3, bookId: "book-s2-03" }
+  },
+  "puzzle2": {
+    question: "Apakah makanan kegemaran saya?",
+    answer: "Nasi Lemak",
+    clue: { shelf: "shelf3", color: "red", position: 2, bookId: "book-s3-02" }
+  },
+  "puzzle3": {
+    question: "Di mana saya membesar?",
+    answer: "Kuantan",
+    clue: { shelf: "shelf1", color: "yellow", position: 4, bookId: "book-s1-04" }
+  }
+  // ...tambah puzzle jika mahu
 };
 
-// Confession data
+// Confession bank, dipadankan dengan ID buku
 const confessions = {
-    BukuBiru: "Ini adalah confession rahsia dalam Buku Biru: 'Saya suka belajar JavaScript pada waktu malam.'",
-    BukuMerah: "Confession Buku Merah: 'Rahsia saya ialah saya pernah tertidur dalam perpustakaan.'",
-    BukuHijau: "Confession Buku Hijau: 'Saya ingin menjadi penulis satu hari nanti.'"
+  "book-s2-03": "Confession #1: Saya suka membaca buku fiksyen sains pada waktu malam.",
+  "book-s3-02": "Confession #2: Saya pernah menangis kerana menonton drama Korea.",
+  "book-s1-04": "Confession #3: Impian saya adalah melancong ke Iceland."
 };
 
-// State
-let unlockedClue = false; // true jika soalan utama telah dijawab dengan betul
+// -----------------------------
+// STATE
+// -----------------------------
+let currentPuzzleId = "puzzle1";
+let unlockedBooks = []; // Simpan bookId yang telah dibuka
+let progress = {}; // Untuk simpan kemajuan (boleh guna localStorage)
 
-// Elemen DOM
-const mainBook = document.getElementById('mainBook');
-const books = document.querySelectorAll('.book:not(.main-book)');
-const questionModal = document.getElementById('questionModal');
-const confessionModal = document.getElementById('confessionModal');
-const closeModal = document.getElementById('closeModal');
-const closeConfession = document.getElementById('closeConfession');
-const questionText = document.getElementById('questionText');
-const answerInput = document.getElementById('answerInput');
-const submitAnswer = document.getElementById('submitAnswer');
-const errorMsg = document.getElementById('errorMsg');
-const confessionText = document.getElementById('confessionText');
+// -----------------------------
+// PEMILIHAN ELEMEN DOM
+// -----------------------------
 
-// Simpan state dalam localStorage
-function saveState() {
-    localStorage.setItem('unlockedClue', unlockedClue ? '1' : '0');
+const books = document.querySelectorAll('.book');
+const startBook = document.querySelector('.start-book');
+const questionModal = document.getElementById('question-modal');
+const questionTitle = document.getElementById('question-title');
+const questionText = document.getElementById('question-text');
+const answerInput = document.getElementById('answer-input');
+const submitAnswerBtn = document.getElementById('submit-answer');
+const questionFeedback = document.getElementById('question-feedback');
+const closeQuestion = document.getElementById('close-question');
+
+const confessionModal = document.getElementById('confession-modal');
+const closeConfession = document.getElementById('close-confession');
+const confessionText = document.getElementById('confession-text');
+
+// -----------------------------
+// UTILITI
+// -----------------------------
+
+function saveProgress() {
+  localStorage.setItem('perpustakaan_confession_progress', JSON.stringify({
+    currentPuzzleId,
+    unlockedBooks
+  }));
 }
-function loadState() {
-    unlockedClue = localStorage.getItem('unlockedClue') === '1';
+
+function loadProgress() {
+  const data = localStorage.getItem('perpustakaan_confession_progress');
+  if (data) {
+    const obj = JSON.parse(data);
+    currentPuzzleId = obj.currentPuzzleId || "puzzle1";
+    unlockedBooks = obj.unlockedBooks || [];
+  }
 }
-loadState();
 
-// Buka modal soalan
-mainBook.addEventListener('click', () => {
-    questionModal.style.display = 'flex';
-    errorMsg.textContent = '';
-    answerInput.value = '';
-    answerInput.focus();
-});
+// -----------------------------
+// MODAL FUNGSI
+// -----------------------------
 
-closeModal.addEventListener('click', () => {
-    questionModal.style.display = 'none';
-});
+function showModal(modal) {
+  modal.classList.add('active');
+}
 
-// Jawab soalan utama
-submitAnswer.addEventListener('click', checkAnswer);
-answerInput.addEventListener('keydown', e => {
-    if (e.key === 'Enter') checkAnswer();
-});
+function hideModal(modal) {
+  modal.classList.remove('active');
+}
 
-function checkAnswer() {
-    const userAns = answerInput.value.trim();
-    if (userAns === mainQuestion.answer) {
-        unlockedClue = true;
-        saveState();
-        errorMsg.style.color = "#4682b4";
-        errorMsg.textContent = "Betul! " + mainQuestion.clue;
-        setTimeout(() => {
-            questionModal.style.display = 'none';
-            errorMsg.textContent = '';
-        }, 2000);
+// -----------------------------
+// SOALAN / PUZZLE LOGIK
+// -----------------------------
+
+function showQuestionModal(puzzleId) {
+  const puzzle = puzzles[puzzleId];
+  if (!puzzle) return;
+  questionTitle.textContent = "Soalan";
+  questionText.textContent = puzzle.question;
+  answerInput.value = "";
+  questionFeedback.textContent = "";
+  showModal(questionModal);
+  answerInput.focus();
+}
+
+function submitAnswer() {
+  const puzzle = puzzles[currentPuzzleId];
+  if (!puzzle) return;
+  const userAnswer = answerInput.value.trim();
+  // Bandingkan case-insensitive & tanpa whitespace
+  if (
+    userAnswer.replace(/\s+/g, '').toLowerCase() ===
+    puzzle.answer.replace(/\s+/g, '').toLowerCase()
+  ) {
+    // Jawapan betul
+    questionFeedback.style.color = "#37884c";
+    questionFeedback.textContent = "Betul! Petunjuk seterusnya: ";
+    // Paparkan petunjuk
+    let clueMsg = `Pergi ke ${puzzle.clue.shelf.toUpperCase()}, cari buku warna ${puzzle.clue.color}, buku ke-${puzzle.clue.position} dari kiri.`;
+    questionFeedback.innerHTML = `<span style="color:#37884c;font-weight:bold;">Betul!</span> <br>Petunjuk: <b>${clueMsg}</b>`;
+    // Unlock buku
+    unlockBook(puzzle.clue.bookId);
+    // Simpan progress
+    saveProgress();
+    // Tukar ke puzzle seterusnya
+    let nextPuzzleNum = parseInt(currentPuzzleId.replace('puzzle','')) + 1;
+    let nextPuzzleId = "puzzle" + nextPuzzleNum;
+    if (puzzles[nextPuzzleId]) {
+      currentPuzzleId = nextPuzzleId;
+      setTimeout(() => { hideModal(questionModal); }, 1700);
     } else {
-        errorMsg.textContent = "Jawapan salah. Sila cuba lagi.";
+      // Tiada lagi puzzle, tamat permainan
+      setTimeout(() => { hideModal(questionModal); }, 1700);
     }
+  } else {
+    // Salah
+    questionFeedback.style.color = "#b43d2f";
+    questionFeedback.textContent = "Jawapan salah, cuba lagi!";
+  }
 }
 
-// Klik buku confession
+// -----------------------------
+// BUKU LOGIK
+// -----------------------------
+
+function unlockBook(bookId) {
+  if (!unlockedBooks.includes(bookId)) {
+    unlockedBooks.push(bookId);
+    // Highlight buku yang aktif
+    const bookElem = document.getElementById(bookId);
+    if (bookElem) {
+      bookElem.classList.add('active-book');
+      bookElem.setAttribute('tabindex', "0");
+      // Optional: animasi blink, dsb
+    }
+  }
+  saveProgress();
+}
+
+function handleBookClick(bookId) {
+  // Buku permulaan
+  if (bookId === "book-s1-01") {
+    showQuestionModal("puzzle1");
+    return;
+  }
+  // Jika buku sudah unlock, paparkan confession
+  if (unlockedBooks.includes(bookId) && confessions[bookId]) {
+    showConfessionModal(confessions[bookId]);
+    return;
+  }
+  // Jika buku sepatutnya unlock (mengikut puzzle semasa)
+  const puzzle = puzzles[currentPuzzleId];
+  if (puzzle && puzzle.clue.bookId === bookId) {
+    // Paparkan confession dan unlock buku
+    unlockBook(bookId);
+    showConfessionModal(confessions[bookId] || "Tiada confession pada buku ini.");
+    return;
+  }
+  // Jika bukan buku yang betul
+  showConfessionModal("Bukan buku ini, cari petunjuk yang betul dulu!");
+}
+
+// -----------------------------
+// CONFESSION MODAL
+// -----------------------------
+
+function showConfessionModal(text) {
+  confessionText.textContent = text;
+  showModal(confessionModal);
+}
+
+// -----------------------------
+// EVENT LISTENERS
+// -----------------------------
+
+// Klik semua buku
 books.forEach(book => {
-    book.addEventListener('click', () => {
-        const id = book.id;
-        if (!unlockedClue && id === 'BukuBiru') {
-            // Buku Biru hanya boleh dibuka jika soalan utama telah dijawab
-            showConfession("Sila jawab soalan pada Buku Utama dahulu untuk membuka confession ini.");
-        } else if (confessions[id]) {
-            showConfession(confessions[id]);
-        } else {
-            showConfession("Tiada confession untuk buku ini.");
-        }
-    });
+  book.addEventListener('click', function() {
+    handleBookClick(this.id);
+  });
+});
+// Enter key untuk buku
+books.forEach(book => {
+  book.addEventListener('keydown', function(e) {
+    if (e.key === "Enter" || e.key === " ") {
+      handleBookClick(this.id);
+    }
+  });
 });
 
-// Modal confession
-function showConfession(text) {
-    confessionText.textContent = text;
-    confessionModal.style.display = 'flex';
+// Tutup modal soalan
+closeQuestion.addEventListener('click', () => hideModal(questionModal));
+// Tutup modal confession
+closeConfession.addEventListener('click', () => hideModal(confessionModal));
+
+// Hantar jawapan (klik/hantar)
+submitAnswerBtn.addEventListener('click', submitAnswer);
+answerInput.addEventListener('keydown', function(e) {
+  if (e.key === "Enter") submitAnswer();
+});
+
+// Tutup modal jika klik di luar kotak
+window.addEventListener('click', function(e) {
+  if (e.target === questionModal) hideModal(questionModal);
+  if (e.target === confessionModal) hideModal(confessionModal);
+});
+
+// -----------------------------
+// INIT
+// -----------------------------
+
+function initBooks() {
+  // Highlight semula buku yang telah unlock (jika reload)
+  unlockedBooks.forEach(bookId => {
+    const bookElem = document.getElementById(bookId);
+    if (bookElem) bookElem.classList.add('active-book');
+  });
 }
-closeConfession.addEventListener('click', () => {
-    confessionModal.style.display = 'none';
-});
 
-// Tutup modal dengan klik di luar kandungan modal
-window.addEventListener('click', (e) => {
-    if (e.target === questionModal) questionModal.style.display = 'none';
-    if (e.target === confessionModal) confessionModal.style.display = 'none';
-});
-
-// Paparkan petunjuk jika sudah unlock
-if (unlockedClue) {
-    setTimeout(() => {
-        questionModal.style.display = 'flex';
-        errorMsg.style.color = "#4682b4";
-        errorMsg.textContent = "Petunjuk: " + mainQuestion.clue;
-    }, 500);
-}
+// -----------------------------
+// LOAD
+// -----------------------------
+(function(){
+  loadProgress();
+  initBooks();
+})();
