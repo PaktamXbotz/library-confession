@@ -1,0 +1,128 @@
+body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: linear-gradient(120deg, #e0eafc, #cfdef3);
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+header {
+    text-align: center;
+    padding: 2rem 1rem 0.5rem 1rem;
+}
+.bookshelf {
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    gap: 2rem;
+    margin: 3rem 0;
+    flex-wrap: wrap;
+}
+.book {
+    width: 90px;
+    height: 140px;
+    background: #f2c572;
+    border-radius: 8px 8px 3px 3px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.09);
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s, background 0.3s;
+    position: relative;
+    user-select: none;
+}
+.book.main-book {
+    background: #4682b4;
+    color: #fff;
+    border: 2px solid #315a7d;
+}
+.book#BukuBiru { background: #4e92d6; color: #fff; }
+.book#BukuMerah { background: #e06363; color: #fff; }
+.book#BukuHijau { background: #77c382; color: #fff; }
+
+.book:hover, .book:focus {
+    transform: translateY(-12px) scale(1.06) rotate(-3deg);
+    box-shadow: 0 12px 28px rgba(60,60,80,0.18);
+    z-index: 2;
+    outline: none;
+}
+
+footer {
+    text-align: center;
+    padding: 1rem;
+    margin-top: auto;
+    color: #333;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 20;
+    left: 0; top: 0; width: 100vw; height: 100vh;
+    background: rgba(10, 20, 40, 0.25);
+    justify-content: center;
+    align-items: center;
+}
+.modal-content {
+    background: #fff;
+    padding: 2rem 1.5rem 1.5rem 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.13);
+    max-width: 350px;
+    width: 90vw;
+    position: relative;
+    text-align: center;
+}
+.close {
+    position: absolute;
+    right: 1rem;
+    top: 1rem;
+    font-size: 1.4rem;
+    cursor: pointer;
+    color: #888;
+}
+input[type="text"] {
+    width: 80%;
+    padding: 0.5rem;
+    margin-top: 1rem;
+    border: 1px solid #aaa;
+    border-radius: 6px;
+    font-size: 1rem;
+}
+button {
+    margin-top: 1rem;
+    padding: 0.5rem 1.2rem;
+    background: #4682b4;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background 0.2s;
+}
+button:hover {
+    background: #315a7d;
+}
+.error {
+    color: #e06363;
+    margin-top: 0.5rem;
+    min-height: 1.2em;
+}
+@media (max-width: 600px) {
+    .bookshelf {
+        flex-direction: column;
+        align-items: center;
+        gap: 1.2rem;
+    }
+    .book {
+        width: 75px;
+        height: 110px;
+        font-size: 0.95rem;
+    }
+    .modal-content {
+        padding: 1.2rem 0.8rem;
+        max-width: 97vw;
+    }
+}
