@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perpustakaan Digital Confession</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>Perpustakaan Digital Confession</h1>
+        <p>Selamat datang ke perpustakaan rahsia. Klik buku utama untuk bermula!</p>
+    </header>
+    <main>
+        <div class="bookshelf">
+            <div class="book main-book" id="mainBook" tabindex="0">Buku Utama</div>
+            <div class="book" id="BukuBiru" tabindex="0">Buku Biru</div>
+            <div class="book" id="BukuMerah" tabindex="0">Buku Merah</div>
+            <div class="book" id="BukuHijau" tabindex="0">Buku Hijau</div>
+        </div>
+        <!-- Modal soalan -->
+        <div class="modal" id="questionModal">
+            <div class="modal-content">
+                <span class="close" id="closeModal">&times;</span>
+                <h2>Soalan Peribadi</h2>
+                <p id="questionText">Apakah tarikh lahir saya (DDMMYY)?</p>
+                <input type="text" id="answerInput" placeholder="Jawapan anda...">
+                <button id="submitAnswer">Hantar</button>
+                <p class="error" id="errorMsg"></p>
+            </div>
+        </div>
+        <!-- Modal confession -->
+        <div class="modal" id="confessionModal">
+            <div class="modal-content">
+                <span class="close" id="closeConfession">&times;</span>
+                <h2>Confession</h2>
+                <div id="confessionText"></div>
+            </div>
+        </div>
+    </main>
+    <footer>
+        <small>&copy; 2025 Perpustakaan Digital Confession</small>
+    </footer>
+    <script src="script.js"></script>
+</body>
+</html>
