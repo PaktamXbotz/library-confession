@@ -1,93 +1,81 @@
 <!DOCTYPE html>
 <html lang="ms">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Perpustakaan Confession</title>
-  <link rel="stylesheet" href="style.css">
-</head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perpustakaan Confession Rahsia</title>
+    <link rel="stylesheet" href="style.css">
+    </head>
 <body>
-  <div class="library-bg"></div>
-  <div class="library-container" id="library-container">
-    <h1 class="library-title">Perpustakaan Confession</h1>
-    
-    <!-- Rak Buku 1 -->
-    <div class="bookshelf" id="shelf1">
-      <div class="shelf-label">Rak 1</div>
-      <div class="books-row">
-        <span class="book start-book red" id="book-s1-01" tabindex="0">Buku<br>Permulaan</span>
-        <span class="book blue" id="book-s1-02" tabindex="0"></span>
-        <span class="book green" id="book-s1-03" tabindex="0"></span>
-        <span class="book yellow" id="book-s1-04" tabindex="0"></span>
-        <span class="book brown" id="book-s1-05" tabindex="0"></span>
-        <span class="book purple" id="book-s1-06" tabindex="0"></span>
-      </div>
-      <div class="shelf-board"></div>
-    </div>
-    <!-- Rak Buku 2 -->
-    <div class="bookshelf" id="shelf2">
-      <div class="shelf-label">Rak 2</div>
-      <div class="books-row">
-        <span class="book blue" id="book-s2-01" tabindex="0"></span>
-        <span class="book blue" id="book-s2-02" tabindex="0"></span>
-        <span class="book blue" id="book-s2-03" tabindex="0"></span>
-        <span class="book yellow" id="book-s2-04" tabindex="0"></span>
-        <span class="book red" id="book-s2-05" tabindex="0"></span>
-      </div>
-      <div class="shelf-board"></div>
-    </div>
-    <!-- Rak Buku 3 -->
-    <div class="bookshelf" id="shelf3">
-      <div class="shelf-label">Rak 3</div>
-      <div class="books-row">
-        <span class="book green" id="book-s3-01" tabindex="0"></span>
-        <span class="book red" id="book-s3-02" tabindex="0"></span>
-        <span class="book red" id="book-s3-03" tabindex="0"></span>
-        <span class="book brown" id="book-s3-04" tabindex="0"></span>
-        <span class="book purple" id="book-s3-05" tabindex="0"></span>
-        <span class="book blue" id="book-s3-06" tabindex="0"></span>
-        <span class="book yellow" id="book-s3-07" tabindex="0"></span>
-      </div>
-      <div class="shelf-board"></div>
-    </div>
-    <!-- Rak Buku 4 -->
-    <div class="bookshelf" id="shelf4">
-      <div class="shelf-label">Rak 4</div>
-      <div class="books-row">
-        <span class="book brown" id="book-s4-01" tabindex="0"></span>
-        <span class="book blue" id="book-s4-02" tabindex="0"></span>
-        <span class="book green" id="book-s4-03" tabindex="0"></span>
-        <span class="book purple" id="book-s4-04" tabindex="0"></span>
-      </div>
-      <div class="shelf-board"></div>
-    </div>
-  </div>
+    <div class="library-container">
+        <h1>Selamat Datang ke Perpustakaan Confession Rahsia</h1>
+        <p class="intro-text">Cari buku istimewa untuk menjumpai rahsia tersembunyi saya...</p>
 
-  <!-- Modal Soalan -->
-  <div class="modal-overlay" id="question-modal">
-    <div class="modal-box">
-      <button class="modal-close" id="close-question">&times;</button>
-      <h2 class="modal-title" id="question-title">Soalan</h2>
-      <div class="modal-body">
-        <p id="question-text">Ini soalan anda...</p>
-        <input type="text" id="answer-input" placeholder="Jawapan anda" autocomplete="off">
-        <button class="submit-btn" id="submit-answer">Hantar</button>
-        <div class="feedback" id="question-feedback"></div>
-      </div>
-    </div>
-  </div>
-  <!-- Modal Confession -->
-  <div class="modal-overlay" id="confession-modal">
-    <div class="modal-box">
-      <button class="modal-close" id="close-confession">&times;</button>
-      <h2 class="modal-title">Confession</h2>
-      <div class="modal-body">
-        <div class="confession-text" id="confession-text">
-          <!-- Confession yang didedahkan akan dipaparkan di sini -->
+        <div class="shelf" id="shelf1">
+            <div class="book red" id="book-s1-01"></div>
+            <div class="book blue" id="book-s1-02"></div>
+            <div class="book green" id="book-s1-03"></div>
+            <div class="book purple" id="book-s1-04"></div>
+            <div class="book yellow" id="book-s1-05"></div>
+            <div class="book cyan" id="book-s1-06"></div>
+            <div class="book magenta" id="book-s1-07"></div>
+            <div class="book orange" id="book-s1-08"></div>
+            <div class="book pink" id="book-s1-09"></div>
+            <div class="book brown" id="book-s1-10"></div>
+            <div class="book teal" id="book-s1-11"></div>
+            <div class="book olive" id="book-s1-12"></div>
+            </div>
+
+        <div class="shelf" id="shelf2">
+            <div class="book red" id="book-s2-01"></div>
+            <div class="book blue" id="book-s2-02"></div>
+            <div class="book green" id="book-s2-03"></div>
+            <div class="book purple" id="book-s2-04"></div>
+            <div class="book yellow" id="book-s2-05"></div>
+            <div class="book cyan" id="book-s2-06"></div>
+            <div class="book magenta" id="book-s2-07"></div>
+            <div class="book orange" id="book-s2-08"></div>
+            <div class="book pink" id="book-s2-09"></div>
+            <div class="book brown" id="book-s2-10"></div>
+            <div class="book teal" id="book-s2-11"></div>
+            <div class="book olive" id="book-s2-12"></div>
         </div>
-      </div>
-    </div>
-  </div>
-  <script src="script.js"></script>
+
+        <div class="shelf" id="shelf3">
+             <div class="book red" id="book-s3-01"></div>
+             <div class="book blue" id="book-s3-02"></div>
+             <div class="book green" id="book-s3-03"></div>
+             <div class="book purple" id="book-s3-04"></div>
+             <div class="book yellow" id="book-s3-05"></div>
+             <div class="book cyan" id="book-s3-06"></div>
+             <div class="book magenta" id="book-s3-07"></div>
+             <div class="book orange" id="book-s3-08"></div>
+             <div class="book pink" id="book-s3-09"></div>
+             <div class="book brown" id="book-s3-10"></div>
+             <div class="book teal" id="book-s3-11"></div>
+             <div class="book olive" id="book-s3-12"></div>
+        </div>
+
+        <div id="questionModal" class="modal">
+            <div class="modal-content">
+                <span class="close-button">&times;</span>
+                <h2 id="questionTitle">Soalan untuk Anda!</h2>
+                <p id="questionText"></p>
+                <input type="text" id="answerInput" placeholder="Masukkan jawapan anda di sini">
+                <button id="submitAnswerBtn">Hantar Jawapan</button>
+                <p id="feedbackText" class="feedback-text"></p>
+            </div>
+        </div>
+
+        <div id="confessionModal" class="modal">
+            <div class="modal-content">
+                <span class="close-button">&times;</span>
+                <h2 id="confessionTitle">Sebuah Rahsia untuk Anda!</h2>
+                <p id="confessionText"></p>
+                <button id="closeConfessionBtn">Tutup</button>
+            </div>
+        </div>
+
+    </div> <script src="script.js"></script>
 </body>
 </html>
