@@ -1,248 +1,197 @@
-// =============================
-// Perpustakaan Confession JS
-// =============================
+/*
+    File: script.js
+    Deskripsi: Logik JavaScript untuk Perpustakaan Confession Interaktif.
+    Fungsi: Menguruskan teka-teki, validasi jawapan, petunjuk buku, dan pendedahan confession.
+*/
 
-// -----------------------------
-// DATA
-// -----------------------------
+document.addEventListener('DOMContentLoaded', () => {
+    // 1. Pemilihan Elemen DOM
+    const libraryContainer = document.querySelector('.library-container');
+    const books = document.querySelectorAll('.book'); // Semua buku
+    const questionModal = document.getElementById('questionModal');
+    const confessionModal = document.getElementById('confessionModal');
+    const questionTitle = document.getElementById('questionTitle');
+    const questionText = document.getElementById('questionText');
+    const answerInput = document.getElementById('answerInput');
+    const submitAnswerBtn = document.getElementById('submitAnswerBtn');
+    const feedbackText = document.getElementById('feedbackText');
+    const confessionText = document.getElementById('confessionText');
+    const closeButtons = document.querySelectorAll('.close-button');
+    const closeConfessionBtn = document.getElementById('closeConfessionBtn');
 
-// Puzzle bank (soalan, jawapan, petunjuk buku seterusnya)
-const puzzles = {
-  "puzzle1": {
-    question: "Apakah tarikh lahir saya (DDMMYY)?",
-    answer: "010190",
-    clue: { shelf: "shelf2", color: "blue", position: 3, bookId: "book-s2-03" }
-  },
-  "puzzle2": {
-    question: "Apakah makanan kegemaran saya?",
-    answer: "Nasi Lemak",
-    clue: { shelf: "shelf3", color: "red", position: 2, bookId: "book-s3-02" }
-  },
-  "puzzle3": {
-    question: "Di mana saya membesar?",
-    answer: "Kuantan",
-    clue: { shelf: "shelf1", color: "yellow", position: 4, bookId: "book-s1-04" }
-  }
-  // ...tambah puzzle jika mahu
-};
+    // 2. Data Permainan (Teka-teki dan Confession)
+    // Gunakan struktur yang lebih terperinci untuk teka-teki
+    const puzzles = {
+        "puzzle1": {
+            question: "Apakah tarikh ulang tahun saya (DDMMYY)?",
+            answer: "010190", // Gantikan dengan tarikh lahir sebenar anda (DDMMYY)
+            clue: {
+                targetBookId: "book-s2-05", // ID buku sasaran di rak 2, buku ke-5
+                message: "Bagus! Sekarang cari buku **kuning** di **rak kedua**, buku ke-5 dari kiri. Itu buku yang memegang rahsia seterusnya!"
+            },
+            nextPuzzleId: "puzzle2" // Puzzle seterusnya yang akan diaktifkan
+        },
+        "puzzle2": {
+            question: "Apakah makanan kegemaran saya yang saya selalu pesan bila kita keluar makan?",
+            answer: "Nasi Lemak", // Gantikan dengan makanan kegemaran anda
+            clue: {
+                targetBookId: "book-s3-01", // ID buku sasaran di rak 3, buku ke-1
+                message: "Hebat! Sekarang cari buku **merah** pertama di **rak ketiga**. Ia mengandungi petunjuk terakhir!"
+            },
+            nextPuzzleId: "finalConfession" // Ini adalah langkah terakhir sebelum confession penuh
+        }
+        // Tambah lagi teka-teki jika anda mahu lebih banyak langkah
+    };
 
-// Confession bank, dipadankan dengan ID buku
-const confessions = {
-  "book-s2-03": "Confession #1: Saya suka membaca buku fiksyen sains pada waktu malam.",
-  "book-s3-02": "Confession #2: Saya pernah menangis kerana menonton drama Korea.",
-  "book-s1-04": "Confession #3: Impian saya adalah melancong ke Iceland."
-};
+    // Data Confession (boleh dipisahkan atau disimpan dalam puzzle)
+    const confessions = {
+        "finalConfession": "Sayangku, setiap langkah yang awak ambil untuk mencari rahsia ini, menunjukkan betapa awak sanggup berusaha untuk memahami saya. Confession saya adalah: saya sangat bersyukur memiliki awak dalam hidup saya, dan setiap detik bersama awak adalah harta yang tak ternilai. Saya cintakan awak lebih dari segalanya! - [Nama Anda]" // Gantikan dengan confession sebenar anda
+    };
 
-// -----------------------------
-// STATE
-// -----------------------------
-let currentPuzzleId = "puzzle1";
-let unlockedBooks = []; // Simpan bookId yang telah dibuka
-let progress = {}; // Untuk simpan kemajuan (boleh guna localStorage)
+    // 3. Pembolehubah State Permainan
+    let currentActivePuzzleId = "puzzle1"; // Mula dengan puzzle pertama
+    let currentClueTargetBookId = null; // ID buku yang perlu dicari sekarang
 
-// -----------------------------
-// PEMILIHAN ELEMEN DOM
-// -----------------------------
+    // 4. Fungsi-fungsi Utama
 
-const books = document.querySelectorAll('.book');
-const startBook = document.querySelector('.start-book');
-const questionModal = document.getElementById('question-modal');
-const questionTitle = document.getElementById('question-title');
-const questionText = document.getElementById('question-text');
-const answerInput = document.getElementById('answer-input');
-const submitAnswerBtn = document.getElementById('submit-answer');
-const questionFeedback = document.getElementById('question-feedback');
-const closeQuestion = document.getElementById('close-question');
+    // Fungsi untuk memaparkan modal soalan
+    const showQuestionModal = (puzzleId) => {
+        const puzzle = puzzles[puzzleId];
+        if (!puzzle) {
+            console.error("Puzzle tidak ditemui:", puzzleId);
+            return;
+        }
+        questionTitle.textContent = `Soalan untuk ${puzzle.question}`;
+        questionText.textContent = puzzle.question;
+        answerInput.value = ''; // Kosongkan input
+        feedbackText.textContent = ''; // Kosongkan maklum balas
+        questionModal.style.display = 'flex'; // Paparkan modal
+    };
 
-const confessionModal = document.getElementById('confession-modal');
-const closeConfession = document.getElementById('close-confession');
-const confessionText = document.getElementById('confession-text');
+    // Fungsi untuk menyembunyikan modal soalan
+    const hideQuestionModal = () => {
+        questionModal.style.display = 'none';
+        // Buang highlight dari buku yang mungkin aktif sebelumnya
+        if (currentClueTargetBookId) {
+            const prevBook = document.getElementById(currentClueTargetBookId);
+            if (prevBook) prevBook.classList.remove('active-clue');
+        }
+    };
 
-// -----------------------------
-// UTILITI
-// -----------------------------
+    // Fungsi untuk menyemak jawapan
+    const handleSubmitAnswer = () => {
+        const userAnswer = answerInput.value.trim().toLowerCase();
+        const correctPuzzle = puzzles[currentActivePuzzleId];
 
-function saveProgress() {
-  localStorage.setItem('perpustakaan_confession_progress', JSON.stringify({
-    currentPuzzleId,
-    unlockedBooks
-  }));
-}
+        if (!correctPuzzle) return; // Tiada puzzle aktif
 
-function loadProgress() {
-  const data = localStorage.getItem('perpustakaan_confession_progress');
-  if (data) {
-    const obj = JSON.parse(data);
-    currentPuzzleId = obj.currentPuzzleId || "puzzle1";
-    unlockedBooks = obj.unlockedBooks || [];
-  }
-}
+        const correctAnswer = correctPuzzle.answer.toLowerCase();
 
-// -----------------------------
-// MODAL FUNGSI
-// -----------------------------
+        if (userAnswer === correctAnswer) {
+            feedbackText.textContent = correctPuzzle.clue.message;
+            feedbackText.classList.remove('wrong');
+            feedbackText.classList.add('correct');
 
-function showModal(modal) {
-  modal.classList.add('active');
-}
+            currentClueTargetBookId = correctPuzzle.clue.targetBookId;
 
-function hideModal(modal) {
-  modal.classList.remove('active');
-}
+            // Highlight buku sasaran (jika ada)
+            if (currentClueTargetBookId) {
+                const targetBook = document.getElementById(currentClueTargetBookId);
+                if (targetBook) {
+                    books.forEach(book => book.classList.remove('active-clue')); // Buang highlight lama
+                    targetBook.classList.add('active-clue');
+                }
+            }
 
-// -----------------------------
-// SOALAN / PUZZLE LOGIK
-// -----------------------------
+            // Selepas beberapa saat, sembunyikan modal dan sedia untuk puzzle seterusnya
+            setTimeout(() => {
+                hideQuestionModal();
+                if (correctPuzzle.nextPuzzleId) {
+                    currentActivePuzzleId = correctPuzzle.nextPuzzleId;
+                } else {
+                    // Jika tiada nextPuzzleId, bermakna semua puzzle selesai, sedia untuk confession akhir
+                    currentActivePuzzleId = "readyForFinalConfession"; // State untuk confession penuh
+                }
+            }, 3000); // Tunjuk petunjuk selama 3 saat
+        } else {
+            feedbackText.textContent = "Jawapan salah. Cuba lagi!";
+            feedbackText.classList.remove('correct');
+            feedbackText.classList.add('wrong');
+            // Boleh tambah logik untuk had cubaan atau petunjuk tambahan
+        }
+    };
 
-function showQuestionModal(puzzleId) {
-  const puzzle = puzzles[puzzleId];
-  if (!puzzle) return;
-  questionTitle.textContent = "Soalan";
-  questionText.textContent = puzzle.question;
-  answerInput.value = "";
-  questionFeedback.textContent = "";
-  showModal(questionModal);
-  answerInput.focus();
-}
+    // Fungsi untuk memaparkan modal confession
+    const showConfessionModal = (text) => {
+        confessionText.textContent = text;
+        confessionModal.style.display = 'flex';
+    };
 
-function submitAnswer() {
-  const puzzle = puzzles[currentPuzzleId];
-  if (!puzzle) return;
-  const userAnswer = answerInput.value.trim();
-  // Bandingkan case-insensitive & tanpa whitespace
-  if (
-    userAnswer.replace(/\s+/g, '').toLowerCase() ===
-    puzzle.answer.replace(/\s+/g, '').toLowerCase()
-  ) {
-    // Jawapan betul
-    questionFeedback.style.color = "#37884c";
-    questionFeedback.textContent = "Betul! Petunjuk seterusnya: ";
-    // Paparkan petunjuk
-    let clueMsg = `Pergi ke ${puzzle.clue.shelf.toUpperCase()}, cari buku warna ${puzzle.clue.color}, buku ke-${puzzle.clue.position} dari kiri.`;
-    questionFeedback.innerHTML = `<span style="color:#37884c;font-weight:bold;">Betul!</span> <br>Petunjuk: <b>${clueMsg}</b>`;
-    // Unlock buku
-    unlockBook(puzzle.clue.bookId);
-    // Simpan progress
-    saveProgress();
-    // Tukar ke puzzle seterusnya
-    let nextPuzzleNum = parseInt(currentPuzzleId.replace('puzzle','')) + 1;
-    let nextPuzzleId = "puzzle" + nextPuzzleNum;
-    if (puzzles[nextPuzzleId]) {
-      currentPuzzleId = nextPuzzleId;
-      setTimeout(() => { hideModal(questionModal); }, 1700);
-    } else {
-      // Tiada lagi puzzle, tamat permainan
-      setTimeout(() => { hideModal(questionModal); }, 1700);
+    // Fungsi untuk menyembunyikan modal confession
+    const hideConfessionModal = () => {
+        confessionModal.style.display = 'none';
+    };
+
+    // 5. Pengendali Event (Event Listeners)
+
+    // Event listener untuk butang hantar jawapan
+    submitAnswerBtn.addEventListener('click', handleSubmitAnswer);
+    answerInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            handleSubmitAnswer();
+        }
+    });
+
+    // Event listeners untuk butang tutup modal
+    closeButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            hideQuestionModal();
+            hideConfessionModal();
+        });
+    });
+    closeConfessionBtn.addEventListener('click', hideConfessionModal);
+
+    // Event listener untuk klik di luar modal (untuk menutup)
+    window.addEventListener('click', (e) => {
+        if (e.target === questionModal) {
+            hideQuestionModal();
+        }
+        if (e.target === confessionModal) {
+            hideConfessionModal();
+        }
+    });
+
+    // Event listener untuk klik pada buku
+    books.forEach(book => {
+        book.addEventListener('click', () => {
+            // Jika ia adalah buku sasaran untuk puzzle semasa
+            if (book.id === currentClueTargetBookId) {
+                if (currentActivePuzzleId === "readyForFinalConfession") {
+                    showConfessionModal(confessions.finalConfession);
+                    // Reset permainan atau sediakan untuk tamat di sini
+                    currentClueTargetBookId = null; // Reset
+                } else {
+                    // Jika buku sasaran telah diklik, dan ada puzzle seterusnya, paparkan soalan seterusnya
+                    showQuestionModal(currentActivePuzzleId);
+                }
+            } else {
+                // Buku yang salah diklik
+                if (!questionModal.style.display || questionModal.style.display === 'none') { // Elakkan mesej jika modal soalan sudah terbuka
+                     alert("Bukan buku ini! Anda perlu menyelesaikan teka-teki untuk mendapatkan petunjuk buku yang betul.");
+                }
+            }
+        });
+    });
+
+    // 6. Logik Permulaan Permainan
+    // Contoh: Buku pertama di rak 1 adalah buku permulaan
+    const startBook = document.getElementById('book-s1-01');
+    if (startBook) {
+        startBook.addEventListener('click', () => {
+            if (currentActivePuzzleId === "puzzle1" && !questionModal.style.display || questionModal.style.display === 'none') {
+                showQuestionModal("puzzle1");
+            }
+        });
+        startBook.classList.add('active-clue'); // Sorot buku permulaan
     }
-  } else {
-    // Salah
-    questionFeedback.style.color = "#b43d2f";
-    questionFeedback.textContent = "Jawapan salah, cuba lagi!";
-  }
-}
-
-// -----------------------------
-// BUKU LOGIK
-// -----------------------------
-
-function unlockBook(bookId) {
-  if (!unlockedBooks.includes(bookId)) {
-    unlockedBooks.push(bookId);
-    // Highlight buku yang aktif
-    const bookElem = document.getElementById(bookId);
-    if (bookElem) {
-      bookElem.classList.add('active-book');
-      bookElem.setAttribute('tabindex', "0");
-      // Optional: animasi blink, dsb
-    }
-  }
-  saveProgress();
-}
-
-function handleBookClick(bookId) {
-  // Buku permulaan
-  if (bookId === "book-s1-01") {
-    showQuestionModal("puzzle1");
-    return;
-  }
-  // Jika buku sudah unlock, paparkan confession
-  if (unlockedBooks.includes(bookId) && confessions[bookId]) {
-    showConfessionModal(confessions[bookId]);
-    return;
-  }
-  // Jika buku sepatutnya unlock (mengikut puzzle semasa)
-  const puzzle = puzzles[currentPuzzleId];
-  if (puzzle && puzzle.clue.bookId === bookId) {
-    // Paparkan confession dan unlock buku
-    unlockBook(bookId);
-    showConfessionModal(confessions[bookId] || "Tiada confession pada buku ini.");
-    return;
-  }
-  // Jika bukan buku yang betul
-  showConfessionModal("Bukan buku ini, cari petunjuk yang betul dulu!");
-}
-
-// -----------------------------
-// CONFESSION MODAL
-// -----------------------------
-
-function showConfessionModal(text) {
-  confessionText.textContent = text;
-  showModal(confessionModal);
-}
-
-// -----------------------------
-// EVENT LISTENERS
-// -----------------------------
-
-// Klik semua buku
-books.forEach(book => {
-  book.addEventListener('click', function() {
-    handleBookClick(this.id);
-  });
 });
-// Enter key untuk buku
-books.forEach(book => {
-  book.addEventListener('keydown', function(e) {
-    if (e.key === "Enter" || e.key === " ") {
-      handleBookClick(this.id);
-    }
-  });
-});
-
-// Tutup modal soalan
-closeQuestion.addEventListener('click', () => hideModal(questionModal));
-// Tutup modal confession
-closeConfession.addEventListener('click', () => hideModal(confessionModal));
-
-// Hantar jawapan (klik/hantar)
-submitAnswerBtn.addEventListener('click', submitAnswer);
-answerInput.addEventListener('keydown', function(e) {
-  if (e.key === "Enter") submitAnswer();
-});
-
-// Tutup modal jika klik di luar kotak
-window.addEventListener('click', function(e) {
-  if (e.target === questionModal) hideModal(questionModal);
-  if (e.target === confessionModal) hideModal(confessionModal);
-});
-
-// -----------------------------
-// INIT
-// -----------------------------
-
-function initBooks() {
-  // Highlight semula buku yang telah unlock (jika reload)
-  unlockedBooks.forEach(bookId => {
-    const bookElem = document.getElementById(bookId);
-    if (bookElem) bookElem.classList.add('active-book');
-  });
-}
-
-// -----------------------------
-// LOAD
-// -----------------------------
-(function(){
-  loadProgress();
-  initBooks();
-})();
