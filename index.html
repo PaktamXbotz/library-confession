@@ -5,12 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Perpustakaan Confession Rahsia</title>
     <link rel="stylesheet" href="style.css">
-    </head>
+</head>
 <body>
     <div class="library-container">
         <h1>Selamat Datang ke Perpustakaan Confession Rahsia</h1>
-        <p class="intro-text">Cari buku istimewa untuk menjumpai rahsia tersembunyi saya...</p>
+        <p class="intro-text">
+            Cari buku istimewa untuk menjumpai rahsia tersembunyi saya...
+        </p>
 
+        <!-- Rak Buku 1 -->
         <div class="shelf" id="shelf1">
             <div class="book red" id="book-s1-01"></div>
             <div class="book blue" id="book-s1-02"></div>
@@ -24,8 +27,9 @@
             <div class="book brown" id="book-s1-10"></div>
             <div class="book teal" id="book-s1-11"></div>
             <div class="book olive" id="book-s1-12"></div>
-            </div>
+        </div>
 
+        <!-- Rak Buku 2 -->
         <div class="shelf" id="shelf2">
             <div class="book red" id="book-s2-01"></div>
             <div class="book blue" id="book-s2-02"></div>
@@ -41,21 +45,23 @@
             <div class="book olive" id="book-s2-12"></div>
         </div>
 
+        <!-- Rak Buku 3 -->
         <div class="shelf" id="shelf3">
-             <div class="book red" id="book-s3-01"></div>
-             <div class="book blue" id="book-s3-02"></div>
-             <div class="book green" id="book-s3-03"></div>
-             <div class="book purple" id="book-s3-04"></div>
-             <div class="book yellow" id="book-s3-05"></div>
-             <div class="book cyan" id="book-s3-06"></div>
-             <div class="book magenta" id="book-s3-07"></div>
-             <div class="book orange" id="book-s3-08"></div>
-             <div class="book pink" id="book-s3-09"></div>
-             <div class="book brown" id="book-s3-10"></div>
-             <div class="book teal" id="book-s3-11"></div>
-             <div class="book olive" id="book-s3-12"></div>
+            <div class="book red" id="book-s3-01"></div>
+            <div class="book blue" id="book-s3-02"></div>
+            <div class="book green" id="book-s3-03"></div>
+            <div class="book purple" id="book-s3-04"></div>
+            <div class="book yellow" id="book-s3-05"></div>
+            <div class="book cyan" id="book-s3-06"></div>
+            <div class="book magenta" id="book-s3-07"></div>
+            <div class="book orange" id="book-s3-08"></div>
+            <div class="book pink" id="book-s3-09"></div>
+            <div class="book brown" id="book-s3-10"></div>
+            <div class="book teal" id="book-s3-11"></div>
+            <div class="book olive" id="book-s3-12"></div>
         </div>
 
+        <!-- Modal Soalan -->
         <div id="questionModal" class="modal">
             <div class="modal-content">
                 <span class="close-button">&times;</span>
@@ -67,6 +73,7 @@
             </div>
         </div>
 
+        <!-- Modal Confession -->
         <div id="confessionModal" class="modal">
             <div class="modal-content">
                 <span class="close-button">&times;</span>
@@ -75,7 +82,7 @@
                 <button id="closeConfessionBtn">Tutup</button>
             </div>
         </div>
-
-    </div> <script src="script.js"></script>
+    </div>
+    <script src="script.js"></script>
 </body>
 </html>
