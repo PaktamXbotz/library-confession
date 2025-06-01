@@ -1,207 +1,221 @@
-/* Reset & Umum */
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-html, body {
-  min-height: 100%;
-  font-family: 'Segoe UI', Arial, sans-serif;
-  background: #f6efe6;
-  color: #2e2e2e;
-}
-/* Latar belakang 'dinding' */
-.library-bg {
-  position: fixed;
-  top: 0; left: 0; width: 100vw; height: 100vh;
-  background: linear-gradient(135deg, #e8d8b9 60%, #c7b199 100%);
-  z-index: 0;
+/*
+    File: style.css
+    Deskripsi: Gaya visual untuk Perpustakaan Confession Interaktif.
+    Fungsi: Memastikan perpustakaan kelihatan seperti imej rujukan, dengan rak dan buku yang pelbagai.
+*/
+
+:root {
+    /* Warna tema */
+    --primary-bg: #2d2d31; /* Warna latar belakang gelap */
+    --secondary-bg: #4f4f53; /* Warna latar belakang modal */
+    --shelf-color: #6d4c41; /* Warna rak buku (coklat kayu) */
+    --text-color: #f0f0f0; /* Warna teks terang */
+    --button-bg: #8e44ad; /* Warna butang (ungu) */
+    --button-hover: #9b59b6; /* Warna butang hover */
+    --feedback-correct: #27ae60; /* Hijau untuk jawapan betul */
+    --feedback-wrong: #e74c3c; /* Merah untuk jawapan salah */
+
+    /* Warna Buku (Contoh) */
+    --book-red: #e74c3c;
+    --book-blue: #3498db;
+    --book-green: #2ecc71;
+    --book-purple: #9b59b6;
+    --book-yellow: #f1c40f;
+    --book-cyan: #1abc9c;
+    --book-magenta: #e91e63;
+    --book-orange: #f39c12;
+    --book-pink: #ff69b4;
+    --book-brown: #795548;
+    --book-teal: #009688;
+    --book-olive: #808000;
 }
 
-/* Kontena utama perpustakaan */
+body {
+    font-family: 'Merriweather', serif; /* Guna fon yang anda pilih atau mana-mana fon sans-serif */
+    background-color: var(--primary-bg);
+    color: var(--text-color);
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    overflow-y: auto; /* Membenarkan scroll jika kandungan lebih besar */
+}
+
 .library-container {
-  position: relative;
-  z-index: 2;
-  margin: 0 auto;
-  padding: 32px 10px 32px 10px;
-  max-width: 900px;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-.library-title {
-  font-size: 2.2rem;
-  font-weight: 700;
-  margin-bottom: 28px;
-  letter-spacing: 0.04em;
-  color: #8b6212;
-  text-shadow: 0 1px 6px #f5e6c8;
+    background-color: rgba(0, 0, 0, 0.4); /* Sedikit gelap untuk latar belakang perpustakaan */
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    text-align: center;
+    max-width: 90%;
+    width: 1000px; /* Lebar maksimum perpustakaan */
+    margin: 20px auto;
 }
 
-/* Rak buku */
-.bookshelf {
-  width: 100%;
-  margin-bottom: 38px;
-  position: relative;
-}
-.shelf-label {
-  font-size: 1.06em;
-  font-weight: bold;
-  color: #a6812f;
-  margin-bottom: 0.3em;
-  margin-left: 12px;
-  letter-spacing: 0.08em;
-}
-.books-row {
-  display: flex;
-  flex-direction: row;
-  gap: 12px;
-  align-items: flex-end;
-  padding: 14px 16px 8px 16px;
-  min-height: 84px;
-}
-.shelf-board {
-  width: 97%;
-  min-height: 18px;
-  max-width: 900px;
-  margin: 0 auto;
-  margin-top: -4px;
-  background: repeating-linear-gradient(to right, #c7a36d 0 38px, #b38b4a 38px 40px);
-  border-radius: 0 0 11px 11px;
-  box-shadow: 0 5px 15px rgba(140, 92, 32, 0.08);
+h1 {
+    color: #ffd700; /* Warna emas untuk tajuk */
+    margin-bottom: 10px;
 }
 
-/* Buku */
+.intro-text {
+    font-style: italic;
+    margin-bottom: 30px;
+}
+
+/* Gaya Rak Buku */
+.shelf {
+    background-color: var(--shelf-color);
+    height: 150px; /* Tinggi setiap rak */
+    margin-bottom: 40px; /* Jarak antara rak */
+    border-radius: 5px;
+    display: flex;
+    align-items: flex-end; /* Buku duduk di dasar rak */
+    padding: 10px;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
+    position: relative; /* Untuk kedudukan buku */
+    justify-content: flex-start; /* Buku bermula dari kiri */
+    flex-wrap: wrap; /* Benarkan buku untuk wrap ke baris baru jika banyak */
+    gap: 5px; /* Jarak antara buku */
+}
+
+/* Gaya Buku */
 .book {
-  width: 50px;
-  height: 80px;
-  border-radius: 6px 6px 2px 2px;
-  box-shadow: 0 2px 10px rgba(60,60,60,0.12);
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  font-size: 0.93em;
-  font-weight: 500;
-  outline: none;
-  border: none;
-  cursor: pointer;
-  user-select: none;
-  transition: transform 0.18s, box-shadow 0.18s, outline 0.14s;
-  background: #d9d2c3;
-  position: relative;
-  min-width: 46px;
-  min-height: 70px;
-  text-align: center;
+    width: 60px; /* Lebar buku */
+    height: 120px; /* Tinggi buku */
+    border-radius: 3px;
+    cursor: pointer;
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    position: relative;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
 }
-.book:focus,
-.book:hover {
-  transform: translateY(-8px) scale(1.08) rotate(-2deg);
-  box-shadow: 0 8px 28px rgba(60,60,80,0.18);
-  outline: 2px solid #8b6212;
-  z-index: 2;
-}
-.book.start-book {
-  background: linear-gradient(120deg, #f86e51 70%, #fbbd8d 100%);
-  color: #fff;
-  font-size: 1em;
-  font-weight: bold;
-  border: 2.5px solid #b43d2f;
-  text-shadow: 0 1px 4px #a63b2b33;
-  box-shadow: 0 4px 16px rgba(220,60,60,0.17);
-}
-.book.red { background: linear-gradient(130deg, #d54b3c 80%, #b43d2f 100%); color: #fff; }
-.book.blue { background: linear-gradient(135deg, #4e92d6 80%, #385a8a 100%); color: #fff; }
-.book.green { background: linear-gradient(120deg, #77c382 80%, #37884c 100%); color: #fff; }
-.book.yellow { background: linear-gradient(120deg, #ffe066 80%, #bdaa2d 100%); color: #7a5c0a; }
-.book.brown { background: linear-gradient(120deg, #a97032 80%, #6b471d 100%); color: #fff; }
-.book.purple { background: linear-gradient(120deg, #7b5eb2 80%, #4f3577 100%); color: #e9e3f6; }
 
-/* Modal/Overlay */
-.modal-overlay {
-  display: none;
-  position: fixed;
-  z-index: 50;
-  left: 0; top: 0; width: 100vw; height: 100vh;
-  background: rgba(40, 44, 60, 0.21);
-  justify-content: center;
-  align-items: center;
+.book:hover {
+    transform: translateY(-5px) scale(1.05); /* Sedikit naik apabila hover */
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
 }
-.modal-overlay.active {
-  display: flex;
+
+/* Warna buku (menggunakan variabel CSS) */
+.book.red { background-color: var(--book-red); }
+.book.blue { background-color: var(--book-blue); }
+.book.green { background-color: var(--book-green); }
+.book.purple { background-color: var(--book-purple); }
+.book.yellow { background-color: var(--book-yellow); }
+.book.cyan { background-color: var(--book-cyan); }
+.book.magenta { background-color: var(--book-magenta); }
+.book.orange { background-color: var(--book-orange); }
+.book.pink { background-color: var(--book-pink); }
+.book.brown { background-color: var(--book-brown); }
+.book.teal { background-color: var(--book-teal); }
+.book.olive { background-color: var(--book-olive); }
+
+/* Gaya Modal */
+.modal {
+    display: none; /* Sembunyi secara default */
+    position: fixed;
+    z-index: 1000; /* Di atas segalanya */
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.7); /* Latar belakang gelap */
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
-.modal-box {
-  background: #fff;
-  padding: 2.2rem 1.4rem 1.4rem 1.4rem;
-  border-radius: 16px;
-  box-shadow: 0 8px 40px rgba(0,0,0,0.13);
-  max-width: 340px;
-  width: 91vw;
-  position: relative;
-  text-align: center;
-  min-height: 120px;
+
+.modal-content {
+    background-color: var(--secondary-bg);
+    margin: auto;
+    padding: 30px;
+    border-radius: 10px;
+    width: 80%;
+    max-width: 500px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.7);
+    position: relative;
+    text-align: center;
 }
-.modal-title {
-  margin-bottom: 1.1em;
-  color: #a6812f;
+
+.close-button {
+    color: var(--text-color);
+    font-size: 28px;
+    font-weight: bold;
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    cursor: pointer;
 }
-.modal-close {
-  position: absolute;
-  right: 1rem;
-  top: 1rem;
-  font-size: 1.5rem;
-  background: none;
-  border: none;
-  color: #888;
-  cursor: pointer;
+
+.close-button:hover,
+.close-button:focus {
+    color: #ccc;
+    text-decoration: none;
+    cursor: pointer;
 }
-.modal-body {
-  margin-top: 0.2em;
+
+#answerInput {
+    width: calc(100% - 20px);
+    padding: 10px;
+    margin-top: 20px;
+    border: 1px solid #555;
+    border-radius: 5px;
+    background-color: #333;
+    color: var(--text-color);
+    font-size: 1em;
 }
-#answer-input {
-  width: 84%;
-  padding: 0.5rem;
-  margin: 1.2rem 0 0.5rem 0;
-  border: 1.5px solid #bdaa2d;
-  border-radius: 7px;
-  font-size: 1rem;
+
+button {
+    background-color: var(--button-bg);
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1em;
+    margin-top: 20px;
+    transition: background-color 0.2s ease;
 }
-.submit-btn {
-  margin-top: 0.7rem;
-  padding: 0.5rem 1.2rem;
-  background: #a6812f;
-  color: #fff;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: bold;
-  transition: background 0.18s;
+
+button:hover {
+    background-color: var(--button-hover);
 }
-.submit-btn:hover { background: #8b6212; }
-.feedback {
-  min-height: 1.3em;
-  font-size: 0.96em;
-  margin-top: 0.7em;
-  color: #b43d2f;
+
+.feedback-text {
+    margin-top: 15px;
+    font-weight: bold;
 }
-.confession-text {
-  font-size: 1.13em;
-  color: #3a2c0d;
-  margin: 1em 0 0.5em 0;
+
+.feedback-text.correct {
+    color: var(--feedback-correct);
+}
+
+.feedback-text.wrong {
+    color: var(--feedback-wrong);
+}
+
+/* Gaya tambahan untuk buku yang 'aktif' atau disorot */
+.book.active-clue {
+    outline: 3px solid var(--feedback-correct); /* Garis hijau untuk buku yang patut dicari */
+    box-shadow: 0 0 15px var(--feedback-correct);
 }
 
 /* Responsif */
-@media (max-width: 800px) {
-  .library-container { max-width: 99vw; }
-  .books-row { gap: 8px; padding: 10px 6px 5px 6px; min-height: 60px; }
-  .book { width: 38px; height: 62px; font-size: 0.78em; }
-  .modal-box { max-width: 99vw; }
-}
-@media (max-width: 480px) {
-  .library-title { font-size: 1.2rem; }
-  .shelf-label { font-size: 0.95em; }
-  .books-row { gap: 4px; }
-  .book { width: 28px; height: 44px; font-size: 0.7em; }
+@media (max-width: 768px) {
+    .library-container {
+        padding: 20px;
+        width: 95%;
+    }
+    .shelf {
+        height: 120px;
+        margin-bottom: 30px;
+    }
+    .book {
+        width: 50px;
+        height: 100px;
+    }
+    .modal-content {
+        width: 90%;
+        padding: 20px;
+    }
 }
