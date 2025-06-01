@@ -6,16 +6,15 @@
 
 :root {
     /* Warna tema */
-    --primary-bg: #2d2d31; /* Warna latar belakang gelap */
-    --secondary-bg: #4f4f53; /* Warna latar belakang modal */
-    --shelf-color: #6d4c41; /* Warna rak buku (coklat kayu) */
-    --text-color: #f0f0f0; /* Warna teks terang */
-    --button-bg: #8e44ad; /* Warna butang (ungu) */
-    --button-hover: #9b59b6; /* Warna butang hover */
-    --feedback-correct: #27ae60; /* Hijau untuk jawapan betul */
-    --feedback-wrong: #e74c3c; /* Merah untuk jawapan salah */
-
-    /* Warna Buku (Contoh) */
+    --primary-bg: #2d2d31;      /* Latar belakang gelap */
+    --secondary-bg: #4f4f53;    /* Latar belakang modal */
+    --shelf-color: #6d4c41;     /* Rak buku (coklat kayu) */
+    --text-color: #f0f0f0;      /* Teks terang */
+    --button-bg: #8e44ad;       /* Butang (ungu) */
+    --button-hover: #9b59b6;    /* Hover butang */
+    --feedback-correct: #27ae60;/* Hijau betul */
+    --feedback-wrong: #e74c3c;  /* Merah salah */
+    /* Warna Buku */
     --book-red: #e74c3c;
     --book-blue: #3498db;
     --book-green: #2ecc71;
@@ -31,7 +30,7 @@
 }
 
 body {
-    font-family: 'Merriweather', serif; /* Guna fon yang anda pilih atau mana-mana fon sans-serif */
+    font-family: 'Merriweather', serif;
     background-color: var(--primary-bg);
     color: var(--text-color);
     margin: 0;
@@ -39,22 +38,22 @@ body {
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    overflow-y: auto; /* Membenarkan scroll jika kandungan lebih besar */
+    overflow-y: auto;
 }
 
 .library-container {
-    background-color: rgba(0, 0, 0, 0.4); /* Sedikit gelap untuk latar belakang perpustakaan */
+    background-color: rgba(0, 0, 0, 0.4);
     padding: 30px;
     border-radius: 10px;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
     text-align: center;
     max-width: 90%;
-    width: 1000px; /* Lebar maksimum perpustakaan */
+    width: 1000px;
     margin: 20px auto;
 }
 
 h1 {
-    color: #ffd700; /* Warna emas untuk tajuk */
+    color: #ffd700;
     margin-bottom: 10px;
 }
 
@@ -63,26 +62,26 @@ h1 {
     margin-bottom: 30px;
 }
 
-/* Gaya Rak Buku */
+/* Rak Buku */
 .shelf {
     background-color: var(--shelf-color);
-    height: 150px; /* Tinggi setiap rak */
-    margin-bottom: 40px; /* Jarak antara rak */
+    height: 150px;
+    margin-bottom: 40px;
     border-radius: 5px;
     display: flex;
-    align-items: flex-end; /* Buku duduk di dasar rak */
+    align-items: flex-end;
     padding: 10px;
     box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
-    position: relative; /* Untuk kedudukan buku */
-    justify-content: flex-start; /* Buku bermula dari kiri */
-    flex-wrap: wrap; /* Benarkan buku untuk wrap ke baris baru jika banyak */
-    gap: 5px; /* Jarak antara buku */
+    position: relative;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    gap: 5px;
 }
 
-/* Gaya Buku */
+/* Buku */
 .book {
-    width: 60px; /* Lebar buku */
-    height: 120px; /* Tinggi buku */
+    width: 60px;
+    height: 120px;
     border-radius: 3px;
     cursor: pointer;
     transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
@@ -91,11 +90,11 @@ h1 {
 }
 
 .book:hover {
-    transform: translateY(-5px) scale(1.05); /* Sedikit naik apabila hover */
+    transform: translateY(-5px) scale(1.05);
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
 }
 
-/* Warna buku (menggunakan variabel CSS) */
+/* Warna Buku */
 .book.red { background-color: var(--book-red); }
 .book.blue { background-color: var(--book-blue); }
 .book.green { background-color: var(--book-green); }
@@ -109,18 +108,17 @@ h1 {
 .book.teal { background-color: var(--book-teal); }
 .book.olive { background-color: var(--book-olive); }
 
-/* Gaya Modal */
+/* Modal */
 .modal {
-    display: none; /* Sembunyi secara default */
+    display: none;
     position: fixed;
-    z-index: 1000; /* Di atas segalanya */
+    z-index: 1000;
     left: 0;
     top: 0;
     width: 100%;
     height: 100%;
     overflow: auto;
-    background-color: rgba(0, 0, 0, 0.7); /* Latar belakang gelap */
-    display: flex;
+    background-color: rgba(0, 0, 0, 0.7);
     justify-content: center;
     align-items: center;
 }
@@ -194,9 +192,9 @@ button:hover {
     color: var(--feedback-wrong);
 }
 
-/* Gaya tambahan untuk buku yang 'aktif' atau disorot */
+/* Buku 'aktif' */
 .book.active-clue {
-    outline: 3px solid var(--feedback-correct); /* Garis hijau untuk buku yang patut dicari */
+    outline: 3px solid var(--feedback-correct);
     box-shadow: 0 0 15px var(--feedback-correct);
 }
 
