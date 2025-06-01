@@ -1,12 +1,10 @@
 /*
     File: script.js
-    Deskripsi: Logik JavaScript untuk Perpustakaan Confession Interaktif.
-    Fungsi: Menguruskan teka-teki, validasi jawapan, petunjuk buku, dan pendedahan confession.
+    Deskripsi: Logik interaktif untuk Perpustakaan Confession dengan petunjuk glowing kecil dan kalendar comel.
 */
 
 document.addEventListener('DOMContentLoaded', () => {
-    // 1. Pemilihan Elemen DOM
-    const libraryContainer = document.querySelector('.library-container');
+    // Pemilihan Elemen DOM
     const books = document.querySelectorAll('.book');
     const questionModal = document.getElementById('questionModal');
     const confessionModal = document.getElementById('confessionModal');
@@ -18,96 +16,223 @@ document.addEventListener('DOMContentLoaded', () => {
     const confessionText = document.getElementById('confessionText');
     const closeButtons = document.querySelectorAll('.close-button');
     const closeConfessionBtn = document.getElementById('closeConfessionBtn');
+    const calendarContainer = document.getElementById('calendarContainer');
 
-    // 2. Data Permainan (Teka-teki dan Confession)
-    const puzzles = {
-        "puzzle1": {
-            question: "Apakah tarikh ulang tahun saya (DDMMYY)?",
-            answer: "010190", // Gantikan dengan tarikh lahir sebenar anda (DDMMYY)
+    // Data Teka-teki dan Confession
+    const puzzles = [
+        {
+            id: "puzzle1",
+            question: "Bila tarikh lahir saya? (Klik pada tarikh dalam kalendar comel di bawah!)",
+            answer: "2000-01-01", // Format YYYY-MM-DD
+            inputType: "calendar",
             clue: {
-                targetBookId: "book-s2-05", // Rak 2, buku ke-5
+                targetBookId: "book-s2-05",
                 message: "Bagus! Sekarang cari buku <b>kuning</b> di <b>rak kedua</b>, buku ke-5 dari kiri. Itu buku yang memegang rahsia seterusnya!"
-            },
-            nextPuzzleId: "puzzle2"
+            }
         },
-        "puzzle2": {
-            question: "Apakah makanan kegemaran saya yang saya selalu pesan bila kita keluar makan?",
-            answer: "Nasi Lemak",
+        {
+            id: "puzzle2",
+            question: "Apakah makanan kegemaran saya? (hint: makanan Malaysia yang popular waktu pagi)",
+            answer: "nasi lemak",
+            inputType: "text",
             clue: {
                 targetBookId: "book-s3-01",
-                message: "Hebat! Sekarang cari buku <b>merah</b> pertama di <b>rak ketiga</b>. Ia mengandungi petunjuk terakhir!"
-            },
-            nextPuzzleId: "finalConfession"
+                message: "Hebat! Sekarang cari buku <b>merah</b> pertama di <b>rak ketiga</b>. Ia mengandungi teka-teki terakhir!"
+            }
+        },
+        {
+            id: "puzzle3",
+            question: "Apakah warna kegemaran saya? (hint: warna yang menenangkan, sering dikaitkan dengan daun dan alam)",
+            answer: "hijau",
+            inputType: "text",
+            clue: {
+                targetBookId: null,
+                message: "Tahniah! Anda telah berjaya. Klik pada butang rahsia untuk mengetahui confession saya!"
+            }
         }
-        // Anda boleh tambah puzzle lain di sini
-    };
+    ];
 
-    const confessions = {
-        "finalConfession":
-            "Sayangku, setiap langkah yang awak ambil untuk mencari rahsia ini, menunjukkan betapa awak sanggup berusaha untuk memahami saya. Confession saya adalah: saya sangat bersyukur memiliki awak dalam hidup saya, dan setiap detik bersama awak adalah harta yang tak ternilai. Saya cintakan awak lebih dari segalanya! - [Nama Anda]"
-    };
+    const confession = "Saya sangat menghargai setiap usaha awak untuk memahami saya. Sebenarnya, rahsia saya adalah... saya sayangkan awak sangat-sangat! <3";
 
-    // 3. State Permainan
-    let currentActivePuzzleId = "puzzle1";
+    // State permainan
+    let currentPuzzleIndex = null;
     let currentClueTargetBookId = null;
+    let calendarInstance = null;
 
-    // 4. Fungsi Utama
-
-    // Papar modal soalan
-    function showQuestionModal(puzzleId) {
-        const puzzle = puzzles[puzzleId];
-        if (!puzzle) {
-            console.error("Puzzle tidak ditemui:", puzzleId);
-            return;
+    // Utiliti untuk glowing di atas buku
+    function addGlowToBook(bookId) {
+        books.forEach(b => {
+            // Remove all glow
+            const existingGlow = b.querySelector('.book-glow');
+            if (existingGlow) existingGlow.remove();
+        });
+        if (bookId) {
+            const book = document.getElementById(bookId);
+            if (book) {
+                // Tambah glow kecil di atas
+                let glow = book.querySelector('.book-glow');
+                if (!glow) {
+                    glow = document.createElement('div');
+                    glow.className = 'book-glow';
+                    glow.innerHTML = '<div class="book-glow-cute"></div>';
+                    book.appendChild(glow);
+                }
+            }
         }
-        questionTitle.textContent = `Soalan untuk Anda!`;
-        questionText.textContent = puzzle.question;
-        answerInput.value = '';
+    }
+
+    // Cute Calendar Component
+    class CuteCalendar {
+        constructor(container, onSelect, defaultDate) {
+            this.container = container;
+            this.onSelect = onSelect;
+            this.selectedDate = defaultDate ? new Date(defaultDate) : null;
+            this.currentDate = this.selectedDate ? new Date(this.selectedDate) : new Date();
+            this.render();
+        }
+        render() {
+            this.container.innerHTML = '';
+            this.container.className = 'cute-calendar';
+
+            // Header: prev, month+year, next
+            const header = document.createElement('div');
+            header.className = 'calendar-header';
+            const prevBtn = document.createElement('button');
+            prevBtn.className = 'calendar-arrow';
+            prevBtn.innerHTML = '‹';
+            const nextBtn = document.createElement('button');
+            nextBtn.className = 'calendar-arrow';
+            nextBtn.innerHTML = '›';
+            const monthSpan = document.createElement('span');
+            const monthNames = [
+                "Januari", "Februari", "Mac", "April", "Mei", "Jun",
+                "Julai", "Ogos", "September", "Oktober", "November", "Disember"
+            ];
+            monthSpan.textContent = monthNames[this.currentDate.getMonth()] + " " + this.currentDate.getFullYear();
+            header.appendChild(prevBtn); header.appendChild(monthSpan); header.appendChild(nextBtn);
+            this.container.appendChild(header);
+
+            // Weekdays
+            const weekdays = document.createElement('div');
+            weekdays.className = 'calendar-weekdays';
+            ["Ahad", "Isn", "Sel", "Rab", "Kha", "Jum", "Sab"].forEach(d => {
+                const wd = document.createElement('div');
+                wd.textContent = d;
+                weekdays.appendChild(wd);
+            });
+            this.container.appendChild(weekdays);
+
+            // Days
+            const daysGrid = document.createElement('div');
+            daysGrid.className = 'calendar-days';
+            const year = this.currentDate.getFullYear();
+            const month = this.currentDate.getMonth();
+            const today = new Date();
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+            // Empty slots before first day
+            for (let i = 0; i < firstDay; i++) {
+                const empty = document.createElement('div');
+                daysGrid.appendChild(empty);
+            }
+            // Dates
+            for (let d = 1; d <= daysInMonth; d++) {
+                const dayBtn = document.createElement('div');
+                dayBtn.className = 'calendar-day';
+                dayBtn.textContent = d.toString();
+                const dateValue = new Date(year, month, d);
+                if (this.selectedDate &&
+                    dateValue.toDateString() === this.selectedDate.toDateString()
+                ) {
+                    dayBtn.classList.add('selected');
+                }
+                if (
+                    dateValue.getDate() === today.getDate() &&
+                    dateValue.getMonth() === today.getMonth() &&
+                    dateValue.getFullYear() === today.getFullYear()
+                ) {
+                    dayBtn.classList.add('today');
+                }
+                dayBtn.addEventListener('click', () => {
+                    this.selectedDate = new Date(year, month, d);
+                    this.onSelect(this.selectedDate);
+                    this.render();
+                });
+                daysGrid.appendChild(dayBtn);
+            }
+            this.container.appendChild(daysGrid);
+
+            // Navigasi bulan
+            prevBtn.onclick = () => {
+                this.currentDate.setMonth(this.currentDate.getMonth() - 1);
+                this.render();
+            };
+            nextBtn.onclick = () => {
+                this.currentDate.setMonth(this.currentDate.getMonth() + 1);
+                this.render();
+            };
+        }
+    }
+
+    // Modal
+    function showQuestionModal(puzzleIndex) {
+        currentPuzzleIndex = puzzleIndex;
+        const puzzle = puzzles[puzzleIndex];
+        questionTitle.textContent = "Soalan untuk Anda!";
+        questionText.innerHTML = puzzle.question;
         feedbackText.textContent = '';
-        feedbackText.classList.remove('correct', 'wrong');
+        feedbackText.className = 'feedback-text';
+        answerInput.style.display = (puzzle.inputType === "text") ? '' : 'none';
+        calendarContainer.style.display = (puzzle.inputType === "calendar") ? '' : 'none';
+        if (puzzle.inputType === "calendar") {
+            // Calendar comel, default tarikh = hari ini
+            calendarInstance = new CuteCalendar(calendarContainer, (date) => {
+                // Format YYYY-MM-DD
+                answerInput.value = date.toISOString().slice(0, 10);
+            });
+            answerInput.value = '';
+        } else {
+            if (calendarInstance) calendarContainer.innerHTML = '';
+            answerInput.value = '';
+        }
         questionModal.style.display = 'flex';
     }
 
-    // Sembunyi modal soalan
     function hideQuestionModal() {
         questionModal.style.display = 'none';
-        if (currentClueTargetBookId) {
-            const prevBook = document.getElementById(currentClueTargetBookId);
-            if (prevBook) prevBook.classList.remove('active-clue');
-        }
     }
 
-    // Semak jawapan
+    function showConfessionModal() {
+        confessionText.innerHTML = confession;
+        confessionModal.style.display = 'flex';
+    }
+    function hideConfessionModal() { confessionModal.style.display = 'none'; }
+
+    // Validasi Jawapan
     function handleSubmitAnswer() {
-        const userAnswer = answerInput.value.trim().toLowerCase();
-        const correctPuzzle = puzzles[currentActivePuzzleId];
-        if (!correctPuzzle) return;
-
-        const correctAnswer = correctPuzzle.answer.toLowerCase();
-
+        const puzzle = puzzles[currentPuzzleIndex];
+        let userAnswer = answerInput.value.trim().toLowerCase();
+        let correctAnswer = puzzle.answer.toLowerCase();
+        // Untuk tipe calendar, ubah format ke YYYY-MM-DD
+        if (puzzle.inputType === "calendar") {
+            userAnswer = userAnswer;
+            correctAnswer = correctAnswer;
+        }
         if (userAnswer === correctAnswer) {
-            feedbackText.innerHTML = correctPuzzle.clue.message;
+            feedbackText.innerHTML = puzzle.clue.message;
             feedbackText.classList.remove('wrong');
             feedbackText.classList.add('correct');
-
-            currentClueTargetBookId = correctPuzzle.clue.targetBookId;
-
-            // Highlight buku sasaran
-            if (currentClueTargetBookId) {
-                books.forEach(book => book.classList.remove('active-clue'));
-                const targetBook = document.getElementById(currentClueTargetBookId);
-                if (targetBook) targetBook.classList.add('active-clue');
-            }
-
-            // Selepas beberapa saat, tutup modal dan sedia untuk langkah seterusnya
+            // Petunjuk glowing ke buku sasaran, kecuali puzzle terakhir (clue.targetBookId === null)
+            addGlowToBook(puzzle.clue.targetBookId);
+            currentClueTargetBookId = puzzle.clue.targetBookId;
             setTimeout(() => {
                 hideQuestionModal();
-                if (correctPuzzle.nextPuzzleId) {
-                    currentActivePuzzleId = correctPuzzle.nextPuzzleId;
-                } else {
-                    currentActivePuzzleId = "readyForFinalConfession";
+                if (puzzleIndexIsLast(puzzleIndexOf(currentClueTargetBookId))) {
+                    // Puzzle terakhir, show confession
+                    setTimeout(showConfessionModal, 700);
                 }
-            }, 3000);
+            }, 2200);
         } else {
             feedbackText.textContent = "Jawapan salah. Cuba lagi!";
             feedbackText.classList.remove('correct');
@@ -115,67 +240,63 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Papar modal confession
-    function showConfessionModal(text) {
-        confessionText.textContent = text;
-        confessionModal.style.display = 'flex';
+    function puzzleIndexOf(bookId) {
+        return puzzles.findIndex(p => p.clue.targetBookId === bookId);
+    }
+    function puzzleIndexIsLast(idx) {
+        // idx adalah index teka-teki terakhir
+        if (idx === puzzles.length - 1 || puzzles[idx]?.clue?.targetBookId === null) return true;
+        return false;
     }
 
-    // Sembunyi modal confession
-    function hideConfessionModal() {
-        confessionModal.style.display = 'none';
-    }
-
-    // 5. Event Listeners
-
+    // Event Listeners
     submitAnswerBtn.addEventListener('click', handleSubmitAnswer);
     answerInput.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') handleSubmitAnswer();
     });
-
-    closeButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            hideQuestionModal();
-            hideConfessionModal();
-        });
+    closeButtons.forEach(btn => btn.onclick = () => {
+        hideQuestionModal();
+        hideConfessionModal();
     });
     closeConfessionBtn.addEventListener('click', hideConfessionModal);
-
     window.addEventListener('click', (e) => {
         if (e.target === questionModal) hideQuestionModal();
         if (e.target === confessionModal) hideConfessionModal();
     });
 
-    // Klik pada buku
+    // Buku diklik
     books.forEach(book => {
         book.addEventListener('click', () => {
-            if (book.id === currentClueTargetBookId) {
-                if (currentActivePuzzleId === "readyForFinalConfession") {
-                    showConfessionModal(confessions.finalConfession);
-                    currentClueTargetBookId = null;
+            // Puzzle pertama, mula di book-s1-01
+            if (currentClueTargetBookId === null && book.id === "book-s1-01") {
+                // Mula permainan
+                showQuestionModal(0);
+                addGlowToBook(null);
+            } else if (currentClueTargetBookId && book.id === currentClueTargetBookId) {
+                // Puzzle berikutnya
+                const nextIdx = puzzleIndexOf(book.id) + 1;
+                if (nextIdx < puzzles.length) {
+                    showQuestionModal(nextIdx);
                 } else {
-                    showQuestionModal(currentActivePuzzleId);
+                    // Puzzle terakhir sudah selesai
+                    addGlowToBook(null);
+                    setTimeout(showConfessionModal, 450);
                 }
             } else {
-                // Elak alert jika modal soalan sedang dibuka
-                if (!questionModal.style.display || questionModal.style.display === 'none') {
-                    alert("Bukan buku ini! Anda perlu menyelesaikan teka-teki untuk mendapatkan petunjuk buku yang betul.");
+                // Buku salah
+                // Alert comel
+                if (questionModal.style.display === 'none' || !questionModal.style.display) {
+                    alert("Bukan buku ini! Cari buku yang mempunyai petunjuk glowing di atasnya.");
                 }
             }
         });
     });
 
-    // 6. Permulaan Permainan: highlight buku permulaan
-    const startBook = document.getElementById('book-s1-01');
-    if (startBook) {
-        startBook.addEventListener('click', () => {
-            if (
-                currentActivePuzzleId === "puzzle1" &&
-                (!questionModal.style.display || questionModal.style.display === 'none')
-            ) {
-                showQuestionModal("puzzle1");
-            }
-        });
-        startBook.classList.add('active-clue');
-    }
+    // Pada scroll, sentiasa pastikan glow tetap kelihatan
+    document.addEventListener('scroll', () => {
+        addGlowToBook(currentClueTargetBookId);
+    });
+
+    // Permulaan: highlight buku permulaan
+    addGlowToBook('book-s1-01');
 });
